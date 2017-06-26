@@ -53,6 +53,7 @@ namespace CheeseMVC.Controllers
                 return Redirect("/Cheese");
             }
 
+            addCheeseViewModel.Categories = AddCheeseViewModel.BuildCategories(context.Categories.ToList());
             return View(addCheeseViewModel);
         }
 
@@ -75,6 +76,37 @@ namespace CheeseMVC.Controllers
             context.SaveChanges();
 
             return Redirect("/");
+        }
+
+        public IActionResult Edit(int ID)
+        {
+            Cheese cheeseToEdit = context.Cheeses.Single(c => c.ID == ID);
+            EditCheeseViewModel editCheeseViewModel = new EditCheeseViewModel(cheeseToEdit, context.Categories.ToList());
+
+            return View(editCheeseViewModel);
+
+        }
+
+        [HttpPost]
+        public IActionResult Edit(EditCheeseViewModel editCheeseViewModel)
+        {
+            Cheese cheeseToEdit = context.Cheeses.Single(c => c.ID == editCheeseViewModel.cheeseID);
+
+            if (ModelState.IsValid)
+            {
+                cheeseToEdit.Name = editCheeseViewModel.Name;
+                cheeseToEdit.Description = editCheeseViewModel.Description;
+                cheeseToEdit.CategoryID = editCheeseViewModel.CategoryID;
+
+                context.SaveChanges();
+
+                return Redirect("/Cheese");
+            }
+
+            editCheeseViewModel.Cheese = cheeseToEdit;
+            editCheeseViewModel.Categories = EditCheeseViewModel.BuildCategories(context.Categories.ToList());
+           
+            return View(editCheeseViewModel);
         }
     }
 }
